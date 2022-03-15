@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    // 允许不可访问的代码
+    "allowUnreachableCode": false,
+    // 允许未使用的标签
+    "allowUnusedLabels": false,
+    // 使用严格模式
+    "alwaysStrict": true,
+    // 是否按照准确的可选类型来验证类型
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false,
+    "module": "ESNext",
+    "declaration": true,
+    "declarationDir": "./types",
+    "importHelpers": true,
+    "lib": [
+      "ES2015",
+      "ES2016",
+      "ES2017",
+      "ES2018",
+      "ES2019",
+      "ES2020",
+      "ES2021",
+      "ESNext",
+      "DOM"
+    ],
+    "outDir": "./dist/esm",
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "allowJs": true,
+    "checkJs": false,
+    "forceConsistentCasingInFileNames": true,
+    // 是否允许存在多余的属性 不建议设置为true 可使用@ts-ignore
+    "suppressExcessPropertyErrors": false,
+    "suppressImplicitAnyIndexErrors": false,
+    "target": "ES2015",
+    // 不需要严格的通用检查
+    "noStrictGenericChecks": false,
+    "paths": {
+      "tslib": ["./node_modules/tslib/tslib.d.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}
