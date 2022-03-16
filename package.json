@@ -1,5 +1,5 @@
 {
-  "name": "@changqing/job-scheduler",
+  "name": "light-job-scheduler",
   "version": "0.0.1",
   "description": "A lightweight job scheduler",
   "module": "./dist/esm/index.js",
@@ -7,13 +7,22 @@
   "author": "changqing",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/changqingom/job-scheduler.git"
+    "url": "git+https://github.com/changqingom/light-scheduler.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "license": "MIT",
+  "files": [
+    "src",
+    "dist",
+    "types"
+  ],
   "scripts": {
-    "build": "npx rimraf ./dist ./types && tsc",
-    "publish": "npm publish",
-    "task:all": "npm run build && npm run publish",
+    "task:build": "npx rimraf ./dist ./types && tsc",
+    "task:publish": "npm publish --registry=https://registry.npmjs.org/",
+    "task:all": "npm run task:build && npm run task:publish",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -27,6 +36,6 @@
     "tslib": "^2.3.1"
   },
   "lint-staged": {
-    "*.{js,css,md}": "prettier --write"
+    "*.{ts,js,css,md}": "prettier --write"
   }
 }
