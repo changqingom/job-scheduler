@@ -16,23 +16,27 @@ export interface ITask {
  */
 export interface IJob {
   id: string;
+  type: "job";
+  groupId?: string;
   add: (task: ITask) => void;
-  run: () => Promise<void>;
+  run: (previousTaskResult: ITaskResult) => Promise<ITaskResult>;
 }
+
 /**
  * 任务调度器
  */
 export interface IJobScheduler {
-  add(job: IJob): void;
+  add(item: IJob | IJobScheduler): void;
   pause(key?: string): string;
   resume(key: string): boolean;
   clear();
 }
 
 export class BaseJob implements IJob {
+  id: string;
+  type: "job";
   private _freeze = false;
   private _queue: ITask[] = [];
-  id: string;
   constructor(options: { id?: string; tasks?: ITask[] } = {}) {
     this.id = options.id || performance.now() + "";
     if (options.tasks) {
@@ -48,45 +52,63 @@ export class BaseJob implements IJob {
       console.warn("任务已冻结,不可再添加");
     }
   }
-  async run(): Promise<void> {
+  async run(previousTaskResult: ITaskResult): Promise<ITaskResult> {
     this._freeze = true;
-    let previousTaskResult;
     for (const task of this._queue) {
       previousTaskResult = await task.run(previousTaskResult);
     }
+    return previousTaskResult;
   }
 }
 
 export class JobScheduler implements IJobScheduler {
-  private _queue: IJob[] = [];
+  private _schedulerStore: Map<string, JobScheduler> = new Map<
+    string,
+    JobScheduler
+  >();
+  private _jobQueue: IJob[] = [];
   private _paused = false;
   private _pauseKeyStore = new Set<string>();
   private _job: IJob;
-  private _run() {
-    this._job = this._queue[0];
+  private _run(previousTaskResult?: ITaskResult) {
+    this._job = this._jobQueue[0];
     if (this._job && !this._paused) {
-      this._job.run().then(() => {
-        this._queue = this._queue.slice(1);
-        this._run();
+      this._job.run(previousTaskResult).then((taskResult) => {
+        this._jobQueue = this._jobQueue.slice(1);
+        this._run(taskResult);
       });
     }
   }
-  add(job: IJob): void {
-    this._queue.push(job);
-    this._queue.length === 1 && this._run();
-  }
-  remove(jobId: string) {
-    if (jobId !== this._job?.id) {
-      this._queue = this._queue.filter((i) => i.id !== jobId);
+  add(job: BaseJob, schedulerId?: string): void {
+    if (schedulerId !== void 0 && schedulerId !== null) {
+      this._schedulerStore.has(schedulerId) ||
+        this._schedulerStore.set(schedulerId, new JobScheduler());
+      this._schedulerStore.get(schedulerId).add(job);
+    } else {
+      this._jobQueue.push(job);
+      this._jobQueue.length === 1 && this._run();
     }
   }
-  pause(key?: string): string {
+  remove(jobId: string, schedulerId?: string) {
+    if (schedulerId !== void 0 && schedulerId !== null) {
+      this._schedulerStore.get(schedulerId)?.remove(jobId);
+    } else if (jobId !== this._job?.id) {
+      this._jobQueue = this._jobQueue.filter((i) => i.id !== jobId);
+    }
+  }
+  pause(key?: string, schedulerId?: string): string {
+    if (schedulerId !== void 0 && schedulerId !== null) {
+      return this._schedulerStore.get(schedulerId)?.pause(key);
+    }
     key || (key = performance.now() + "");
     this._pauseKeyStore.add(key);
     this._paused = true;
     return key;
   }
-  resume(key?: string): boolean {
+  resume(key?: string, schedulerId?: string): boolean {
+    if (schedulerId !== void 0 && schedulerId !== null) {
+      return this._schedulerStore.get(schedulerId)?.resume(key);
+    }
     if (key) {
       this._pauseKeyStore.delete(key);
       if (this._pauseKeyStore.size > 0) {
@@ -99,8 +121,16 @@ export class JobScheduler implements IJobScheduler {
     this._run();
     return true;
   }
-  clear() {
-    this._queue = [];
-    this._pauseKeyStore.clear();
+  clear(schedulerId?: string) {
+    if (schedulerId !== void 0 && schedulerId !== null) {
+      this._schedulerStore.get(schedulerId)?.clear();
+    } else {
+      this._jobQueue = [];
+      this._pauseKeyStore.clear();
+      this._schedulerStore.forEach((scheduler) => {
+        scheduler.clear();
+      });
+      this._schedulerStore.clear();
+    }
   }
 }

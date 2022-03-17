@@ -37,6 +37,7 @@
     "target": "ES2015",
     // 不需要严格的通用检查
     "noStrictGenericChecks": false,
+    "esModuleInterop": true,
     "paths": {
       "tslib": ["./node_modules/tslib/tslib.d.ts"]
     }

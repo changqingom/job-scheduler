@@ -1,5 +1,5 @@
 {
-  "name": "light-job-scheduler",
+  "name": "light-scheduler",
   "version": "0.0.1",
   "description": "A lightweight job scheduler",
   "module": "./dist/esm/index.js",
@@ -20,16 +20,20 @@
     "types"
   ],
   "scripts": {
+    "test": "jest",
     "task:build": "npx rimraf ./dist ./types && tsc",
     "task:publish": "npm publish --registry=https://registry.npmjs.org/",
     "task:all": "npm run task:build && npm run task:publish",
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.1",
     "husky": ">=6",
+    "jest": "^27.5.1",
     "lint-staged": ">=10",
     "prettier": "2.5.1",
     "rimraf": "^3.0.2",
+    "ts-jest": "^27.1.3",
     "typescript": "^4.6.2"
   },
   "dependencies": {
