@@ -1,10 +1,10 @@
 /**
  * 工作执行结果
  */
-export interface ITaskResult {
+export type ITaskResult = void | {
   data?: { [key: string]: any };
   scope?: any;
-}
+};
 /**
  * 工作接口
  */
@@ -16,8 +16,6 @@ export interface ITask {
  */
 export interface IJob {
   id: string;
-  type: "job";
-  groupId?: string;
   add: (task: ITask) => void;
   run: (previousTaskResult: ITaskResult) => Promise<ITaskResult>;
 }
@@ -34,7 +32,6 @@ export interface IJobScheduler {
 
 export class BaseJob implements IJob {
   id: string;
-  type: "job";
   private _freeze = false;
   private _queue: ITask[] = [];
   constructor(options: { id?: string; tasks?: ITask[] } = {}) {
@@ -70,11 +67,17 @@ export class JobScheduler implements IJobScheduler {
   private _paused = false;
   private _pauseKeyStore = new Set<string>();
   private _job: IJob;
-  private _run(previousTaskResult?: ITaskResult) {
+
+  public get job(): IJob {
+    return this._job;
+  }
+
+  private _run(previousTaskResult: ITaskResult) {
     this._job = this._jobQueue[0];
     if (this._job && !this._paused) {
       this._job.run(previousTaskResult).then((taskResult) => {
         this._jobQueue = this._jobQueue.slice(1);
+        this._job = void 0;
         this._run(taskResult);
       });
     }

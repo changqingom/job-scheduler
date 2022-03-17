@@ -1,8 +1,9 @@
 {
   "name": "light-scheduler",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A lightweight job scheduler",
   "module": "./dist/esm/index.js",
+  "main": "./dist/cjs/index.js",
   "typings": "types/index.d.ts",
   "author": "changqing",
   "repository": {
@@ -15,30 +16,30 @@
   },
   "license": "MIT",
   "files": [
-    "src",
     "dist",
     "types"
   ],
   "scripts": {
     "test": "jest",
-    "task:build": "npx rimraf ./dist ./types && tsc",
+    "task:build": "npx rimraf ./dist ./types && rollup -c rollup.config.js && tsc --emitDeclarationOnly",
     "task:publish": "npm publish --registry=https://registry.npmjs.org/",
     "task:all": "npm run task:build && npm run task:publish",
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.3.1",
     "@types/jest": "^27.4.1",
     "husky": ">=6",
     "jest": "^27.5.1",
     "lint-staged": ">=10",
     "prettier": "2.5.1",
     "rimraf": "^3.0.2",
+    "rollup": "^2.70.1",
     "ts-jest": "^27.1.3",
+    "tslib": "^2.3.1",
     "typescript": "^4.6.2"
   },
-  "dependencies": {
-    "tslib": "^2.3.1"
-  },
+  "dependencies": {},
   "lint-staged": {
     "*.{ts,js,css,md}": "prettier --write"
   }
