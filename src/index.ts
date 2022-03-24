@@ -181,6 +181,9 @@ export class JobScheduler implements IJobScheduler {
     if (defined(schedulerId)) {
       return this._schedulerStore.get(schedulerId)?.pause(key);
     }
+    this._schedulerStore.forEach((jobScheduler) => {
+      jobScheduler.pause(key);
+    });
     key || (key = performance.now() + "");
     this._pauseKeyStore.add(key);
     this._paused = true;
@@ -193,6 +196,9 @@ export class JobScheduler implements IJobScheduler {
     if (defined(schedulerId)) {
       return this._schedulerStore.get(schedulerId)?.resume(key);
     }
+    this._schedulerStore.forEach((jobScheduler) => {
+      jobScheduler.resume(key);
+    });
     if (key) {
       this._pauseKeyStore.delete(key);
       if (this._pauseKeyStore.size > 0) {
