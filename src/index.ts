@@ -46,6 +46,10 @@ export interface IJobScheduler {
    */
   add(job: IJob, schedulerId?: string): IJobScheduler;
   /**
+   * 移除工作
+   */
+  remove(jobId: string, schedulerId?: string): boolean;
+  /**
    * 传入调度器id则只暂停对应的调度器
    */
   pause(key?: string, schedulerId?: string): string;
@@ -141,6 +145,11 @@ export class JobScheduler implements IJobScheduler {
         });
     }
   }
+  /**
+   * 添加工作
+   *
+   * 如果传入调度器id则将工作添加到该id对应的调度器,调度器并行执行,工作串行执行
+   */
   add(job: BaseJob, schedulerId?: string): JobScheduler {
     if (defined(schedulerId)) {
       this._schedulerStore.has(schedulerId) ||
@@ -152,6 +161,9 @@ export class JobScheduler implements IJobScheduler {
     }
     return this;
   }
+  /**
+   * 移除工作
+   */
   remove(jobId: string, schedulerId?: string): boolean {
     if (defined(schedulerId)) {
       return this._schedulerStore.get(schedulerId)?.remove(jobId) || false;
@@ -162,6 +174,9 @@ export class JobScheduler implements IJobScheduler {
     console.warn("执行中的工作不可删除");
     return false;
   }
+  /**
+   * 传入调度器id则只暂停对应的调度器
+   */
   pause(key?: string, schedulerId?: string): string {
     if (defined(schedulerId)) {
       return this._schedulerStore.get(schedulerId)?.pause(key);
@@ -171,6 +186,9 @@ export class JobScheduler implements IJobScheduler {
     this._paused = true;
     return key;
   }
+  /**
+   * 传入调度器id则只恢复对应的调度器
+   */
   resume(key?: string, schedulerId?: string): boolean {
     if (defined(schedulerId)) {
       return this._schedulerStore.get(schedulerId)?.resume(key);
@@ -187,6 +205,9 @@ export class JobScheduler implements IJobScheduler {
     this._run();
     return true;
   }
+  /**
+   * 传入调度器id则只清空对应的调度器
+   */
   clear(schedulerId?: string): JobScheduler {
     if (defined(schedulerId)) {
       this._schedulerStore.get(schedulerId)?.clear();

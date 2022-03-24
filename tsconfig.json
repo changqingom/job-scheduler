@@ -27,7 +27,7 @@
     ],
     "outDir": "./dist/esm",
     "preserveConstEnums": true,
-    "removeComments": true,
+    "removeComments": false,
     "allowJs": true,
     "checkJs": false,
     "forceConsistentCasingInFileNames": true,
