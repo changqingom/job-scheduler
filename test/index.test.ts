@@ -1,5 +1,7 @@
 import { JobScheduler, BaseJob, ITaskResult } from "../src/index";
 
+jest.setTimeout(10 * 1000);
+
 const sleep = (time) =>
   new Promise((resolve) => setTimeout(resolve, time * 1000));
 
@@ -134,7 +136,7 @@ test("调度器", async () => {
     );
   });
   await sleep(1);
-  expect(scheduler.job).toBeUndefined();
+  expect(scheduler.activeJob).toBeUndefined();
   return;
 });
 
@@ -184,6 +186,39 @@ test("工作组", async () => {
     );
   });
   await sleep(1);
-  expect(scheduler.job).toBeUndefined();
+  expect(scheduler.activeJob).toBeUndefined();
   return;
+});
+
+test("作用域", (done) => {
+  const scheduler = new JobScheduler();
+  scheduler.add(
+    new BaseJob({
+      tasks: [
+        {
+          async run(res?: ITaskResult) {
+            expect(this.jobScheduler instanceof JobScheduler).toBeTruthy();
+            expect(this.job instanceof BaseJob).toBeTruthy();
+            expect(this.jobScheduler.paused).toBeFalsy();
+            await sleep(1);
+            scheduler.pause();
+            await sleep(1);
+            expect(this.jobScheduler.paused).toBeTruthy();
+            await sleep(1);
+            scheduler.resume();
+          },
+        },
+        {
+          async run(res?: ITaskResult) {
+            expect(this.jobScheduler.paused).toBeFalsy();
+          },
+        },
+        {
+          async run() {
+            done();
+          },
+        },
+      ],
+    })
+  );
 });

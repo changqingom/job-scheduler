@@ -1,6 +1,6 @@
 {
   "name": "light-scheduler",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A lightweight job scheduler",
   "module": "./dist/esm/index.js",
   "main": "./dist/cjs/index.js",
@@ -20,7 +20,7 @@
     "types"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "yarn jest --detectOpenHandles --forceExit",
     "task:build": "npx rimraf ./dist ./types && rollup -c rollup.config.js && tsc --emitDeclarationOnly",
     "task:publish": "npm publish --registry=https://registry.npmjs.org/",
     "task:all": "npm run task:build && npm run task:publish",
