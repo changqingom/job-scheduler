@@ -1,7 +1,7 @@
 /**
  * 任务执行结果
  */
-export type ITaskResult = void | {
+export type ITaskResult = {
   data?: { [key: string]: any };
   scope?: any;
 };
@@ -15,7 +15,7 @@ export interface ITask {
   run: (
     this: { jobScheduler: IJobScheduler; job: IJob; task: ITask },
     previousTaskResult: ITaskResult
-  ) => Promise<ITaskResult>;
+  ) => Promise<ITaskResult | void>;
 }
 /**
  * 工作接口
@@ -133,7 +133,7 @@ export class JobScheduler implements IJobScheduler {
   get activeJob(): IJob {
     return this._activeJob;
   }
-  private _run(previousTaskResult: ITaskResult) {
+  private _run(previousTaskResult?: ITaskResult) {
     this._activeJob = this._jobQueue[0];
     if (this._activeJob && !this._paused) {
       this._activeJob.run

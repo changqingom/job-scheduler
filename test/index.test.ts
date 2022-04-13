@@ -1,4 +1,11 @@
-import { JobScheduler, BaseJob, ITaskResult } from "../src/index";
+import {
+  JobScheduler,
+  BaseJob,
+  ITaskResult,
+  IJobScheduler,
+  IJob,
+  ITask,
+} from "../src/index";
 
 jest.setTimeout(10 * 1000);
 
@@ -214,7 +221,14 @@ test("作用域", (done) => {
           },
         },
         {
-          async run() {
+          async run(
+            this: {
+              jobScheduler: IJobScheduler;
+              job: IJob;
+              task: ITask;
+            },
+            previousTaskResult: ITaskResult
+          ): Promise<ITaskResult | void> {
             done();
           },
         },
